@@ -1,0 +1,83 @@
+kind: class
+summary: |
+  The base class for all widgets.
+extends: Object
+extensibility: abstract
+
+methods:
+  - name: GetParent
+    summary: |
+      Returns the parent of the widget.
+    returns:
+      - summary: |
+          The parent of the widget.
+        type:
+          kind: union
+          members:
+            - ManagedContainerWidget
+            - WidgetHost
+            - nil
+
+  - name: RemoveParent
+    summary: |
+      Removes the widget from its parent if the widget has a parent.
+
+  - name: IsDescendantOf
+  - summary: |
+      Returns whether the widget is a descendant of the given widget or not.
+    arguments:
+      - name: ancestor
+        summary: |
+          The widget being checked for ancestry.
+        type:
+          kind: union
+          members:
+            - ManagedContainerWidget
+            - WidgetHost
+    returns:
+      - summary: |
+          Whether the widget was a descendant of the given widget or not.
+        type: boolean
+
+  - name: SetPosition
+    summary: |
+      Sets the position of the widget.
+    arguments:
+      - name: position
+        type: UDim2
+
+  - name: SetSize
+    summary: |
+      Sets the size of the widget.
+    arguments:
+      - name: size
+        type: UDim2
+
+  - name: Show
+    summary: |
+      Sets the visibility of the widget to `true`.
+
+  - name: Hide
+    summary: |
+      Sets the visibility of the widget to `false`.
+
+  - name: _GetRoot
+    summary: |
+      Returns the root element of the widget.
+    visibility: protected
+    extensibility: abstract
+    
+  - name: GetVisibility
+    summary: |
+      Returns the visibility of the widget.
+    extensibility: abstract
+    returns:
+      - type: boolean
+
+  - name: SetVisibility
+    summary: |
+      Sets the visibility of the widget.
+    extensibility: abstract
+    arguments:
+      - name: visibility
+        type: boolean

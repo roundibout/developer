@@ -1,0 +1,10 @@
+{{ $section := . }}
+
+{{ range $name, $api := site.Data.spur.reference }}
+    {{ $section.AddPage (dict
+        "kind" "page"
+        "path" $name
+        "title" $name
+        "params" $api
+    ) }}
+{{ end }}

@@ -1,0 +1,5 @@
+kind: class
+extensibility: abstract
+
+methods:
+  - name: Destroy
