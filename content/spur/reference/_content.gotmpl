@@ -4,6 +4,7 @@
     {{ $section.AddPage (dict
         "kind" "page"
         "path" $name
+        "url" (printf "/spur/reference/%s/" $name)
         "title" $name
         "params" $api
     ) }}
