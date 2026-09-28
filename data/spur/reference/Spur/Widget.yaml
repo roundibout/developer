@@ -1,10 +1,12 @@
 kind: class
 summary: |
   The base class for all widgets.
-description: |
-  Lorem ipsum
-extends: Object
+extends: Spur.Object
 extensibility: abstract
+
+initializer:
+  summary: |
+    Initializes the widget.
 
 methods:
   - name: GetParent
@@ -16,8 +18,8 @@ methods:
         type:
           kind: union
           members:
-            - ManagedContainerWidget
-            - WidgetHost
+            - Spur.ManagedContainerWidget
+            - Spur.WidgetHost
             - nil
 
   - name: RemoveParent
@@ -34,8 +36,8 @@ methods:
         type:
           kind: union
           members:
-            - ManagedContainerWidget
-            - WidgetHost
+            - Spur.ManagedContainerWidget
+            - Spur.WidgetHost
     returns:
       - summary: |
           Whether the widget was a descendant of the given widget or not.
@@ -46,14 +48,18 @@ methods:
       Sets the position of the widget.
     arguments:
       - name: position
-        type: UDim2
+        type:
+          external: UDim2
+          source: roblox
 
   - name: SetSize
     summary: |
       Sets the size of the widget.
     arguments:
       - name: size
-        type: UDim2
+        type:
+          external: UDim2
+          source: roblox
 
   - name: Show
     summary: |
@@ -68,6 +74,10 @@ methods:
       Returns the root element of the widget.
     visibility: protected
     extensibility: abstract
+    returns:
+      - type:
+          external: GuiObject
+          source: roblox
     
   - name: GetVisibility
     summary: |

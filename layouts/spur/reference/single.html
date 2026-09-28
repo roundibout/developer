@@ -1,3 +1,121 @@
+{{ define "type" }}
+    {{- if reflect.IsMap .type -}}
+        {{- if .type.external -}}
+            {{/* External type */}}
+            {{- if .links -}}
+                {{- $url := index (index hugo.Data.spur.reference._external .type.source) (lower .type.external) -}}
+                {{- if $url -}}
+                    <a href="{{ $url }}" class="token-type">{{ .type.external }}</a>
+                {{- else -}}
+                    <span class="token-type">{{ .type.external }}</span>
+                {{- end -}}
+            {{- else -}}
+                <span class="token-type">{{ .type.external }}</span>
+            {{- end -}}
+        {{- else if eq .type.kind "union" -}}
+            {{- range $index, $member := .type.members -}}
+                {{- if gt $index 0 }} <span class="token-type-punctuation">|</span> {{ end -}}
+                {{- template "type" (dict "type" $member) -}}
+            {{- end -}}
+        {{- end -}}
+    {{- else -}}
+        {{/* Local type */}}
+        {{- $type := .type -}}
+        {{- $parts := split $type "." -}}
+        {{- $data := hugo.Data.spur.reference -}}
+        {{- $found := true -}}
+
+        {{- range $parts -}}
+            {{- if $found -}}
+                {{- if isset $data . -}}
+                    {{- $data = index $data . -}}
+                {{- else -}}
+                    {{- $found = false -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+
+        {{- if $found -}}
+            {{- $name := index $parts (sub (len $parts) 1) -}}
+            {{- if isset $data "name" -}}
+                {{- $name = $data.name -}}
+            {{- end -}}
+
+            {{- if .links -}}
+                <a href="{{ printf "/spur/reference/%s/" (path.Join $parts) }}" class="token-type">{{ $name }}</a>
+            {{- else -}}
+                <span class="token-type">{{ $name }}</span>
+            {{- end -}}
+        {{- else -}}
+            <span class="token-type">{{ $type }}</span>
+        {{- end -}}
+    {{- end -}}
+{{ end }}
+
+{{ define "function" }}
+    {{ $function := .function }}
+    {{ $links := .links }}
+
+    {{ if eq $function.visibility "protected" }}
+        <span class="token-keyword">protected</span> 
+    {{ end }}
+    {{ if eq $function.extensibility "open" }}
+        <span class="token-keyword">open</span> 
+    {{ else if eq $function.extensibility "abstract" }}
+        <span class="token-keyword">abstract</span> 
+    {{ end }}
+
+    <span class="token-keyword">function</span> <span class="token-identifier">{{ $function.name }}</span><span class="token-punctuation">(</span>
+    {{- if .method -}}
+        <span class="token-self">self</span>
+        {{- if $function.arguments -}}
+            <span class="token-punctuation">,</span>
+        {{ end -}}
+    {{- end -}}
+    {{- if $function.arguments -}}
+        {{- range $index, $member := $function.arguments -}}
+            {{ if gt $index 0 }}<span class="token-punctuation">,</span> {{ end }}
+            {{- if eq $member.name "self" -}}
+                <span class="token-self">self</span>
+            {{- else -}}
+                <span class="token-identifier">{{ $member.name }}</span>
+                {{- if $member.type -}}
+                    <span class="token-type-punctuation">:</span>
+                    {{ template "type" (dict "type" $member.type "links" $links) }}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+    <span class="token-punctuation">)</span>
+
+    {{- if $function.returns -}}
+        {{- if eq (len $function.returns) 1 -}}
+            <span class="token-type-punctuation">:</span>
+            {{ template "type" (dict "type" (index $function.returns 0).type "links" $links) }}
+        {{- else if gt (len $function.returns) 1 -}}
+            <span class="token-type-punctuation">:</span> <span class="token-type-punctuation">(</span>
+            {{ range $index, $member := $function.returns }}
+                {{ if gt $index 0 }}<span class="token-type-punctuation">,</span> {{ end }}
+                {{ template "type" (dict "type" $member.type "links" $links) }}
+            {{ end }}
+            <span class="token-type-punctuation">)</span>
+        {{ end }}
+    {{ end }}
+{{ end }}
+
+{{ define "field" }}
+    {{ if eq .field.visibility "protected" }}
+        <span class="token-keyword">protected</span> 
+    {{ else }}
+        <span class="token-keyword">public</span> 
+    {{ end }}
+    <span class="token-identifier">{{ .field.name }}</span>
+    {{- if .field.type -}}
+        <span class="token-type-punctuation">:</span>
+        {{ template "type" (dict "type" .field.type "links" .links) }}
+    {{- end -}}
+{{ end }}
+
 {{ define "main" }}
 
 <div class="reference-layout">
@@ -13,40 +131,111 @@
             <p class="reference-path">
                 {{ range $ancestor := .Params.apiAncestors }}<a href="{{ $ancestor.url }}">{{ $ancestor.name }}</a>.{{ end }}{{ .Title }}
             </p>
+            {{ if eq .Params.kind "class" }}
+                <p class="reference-type">Class</p>
+            {{ else if eq .Params.kind "namespace" }}
+                <p class="reference-type">Namespace</p>
+            {{ end }}
             <h1 class="reference-title">{{ if .Params.name }}{{.Params.name}}{{ else }}{{.Title}}{{ end }}</h1>
             <p class="reference-summary">{{ .Params.summary }}</p>
             {{ if eq .Params.kind "class" }}
                 <div class="code-block">
-                    {{ if .Params.extensibility }}
-                        {{ if eq .Params.extensibility "open" }}
-                            <span class="token-keyword">open</span> {{ end }}
-                        {{ if eq .Params.extensibility "abstract" }}
-                            <span class="token-keyword">abstract</span> {{ end }}
+                    {{ if eq .Params.extensibility "open" }}
+                        <span class="token-keyword">open</span>
+                    {{ else if eq .Params.extensibility "abstract" }}
+                        <span class="token-keyword">abstract</span> 
                     {{ end }}
-                    <span class="token-keyword">class</span> <span class="token-identifier">{{ if .Params.name }}{{.Params.name}}{{ else }}{{.Title}}{{ end }}</span>
-                    {{ if .Params.extends }} <span class="token-keyword">extends</span> <span class="token-identifier">{{ .Params.extends }}</span>{{ end }}
+                    <span class="token-keyword">class</span> <span class="token-type">{{ if .Params.name }}{{.Params.name}}{{ else }}{{.Title}}{{ end }}</span>
+                    {{ if .Params.extends }} <span class="token-keyword">extends</span> {{ template "type" (dict "type" .Params.extends "links" true) }}{{ end }}
                 </div>
             {{ end }}
             
         </div></header>
 
         <div class="reference-body"><div class="reference-body-content">
-            
-            <h1 class="reference-section">Summary</h1>
-            <!--<h2 class="reference-subsection">Constructors</h2>-->
-            <!--<h2 class="reference-subsection">Fields</h2>-->
 
-            {{ if .Params.methods }}
-                <h2 class="reference-subsection">Methods</h2>
-            {{ end }}
-            
-            <!--<h2 class="reference-subsection">Operators</h2>-->
             {{ if .Params.description }}
-                <h2 class="reference-subsection">Description</h2>
+                <h1 class="reference-section">Description</h1>
                 <p class="reference-description">{{ .Params.description }}</p>
             {{ end }}
             
-            <h1 class="reference-section">API Reference</h1>
+            {{ if or (isset .Params "initializer") .Params.constructors }}
+                <h1 class="reference-section">Constructors</h1>
+                {{ if isset .Params "initializer" }}
+                    {{ $initializer := merge (dict "name" "__init") .Params.initializer }}
+                    <div class="reference-summary-item">
+                        <a href="{{ .RelPermalink }}__init/" class="reference-summary-item-code">{{ template "function" (dict "function" $initializer "method" true) }}</a>
+                        {{ if $initializer.summary }}
+                            <p class="reference-summary-item-summary">{{ $initializer.summary }}</p>
+                        {{ end }}
+                    </div>
+                {{ end }}
+                {{ if .Params.constructors }}
+                    {{ $constructors := sort .Params.constructors "name" }}
+                    {{ range $constructors }}
+                        <div class="reference-summary-item">
+                            <a href="{{ $.RelPermalink }}{{ .name }}/" class="reference-summary-item-code">{{ template "function" (dict "function" .) }}</a>
+                            {{ if .summary }}
+                                <p class="reference-summary-item-summary">{{ .summary }}</p>
+                            {{ end }}
+                        </div>
+                    {{ end }}
+                {{ end }}
+            {{ end }}
+            
+            {{ if .Params.fields }}
+                <h1 class="reference-section">Fields</h1>
+                {{ $fields := sort .Params.fields "name" }}
+
+                {{ $publicFields := where $fields "visibility" "ne" "protected" }}
+                {{ $protectedFields := where $fields "visibility" "protected" }}
+
+                {{ range $publicFields }}
+                    <div class="reference-summary-item">
+                        <a href="{{ $.RelPermalink }}{{ .name }}/" class="reference-summary-item-code">{{ template "field" (dict "field" .) }}</a>
+                        {{ if .summary }}
+                            <p class="reference-summary-item-summary">{{ .summary }}</p>
+                        {{ end }}
+                    </div>
+                {{ end }}
+
+                {{ range $protectedFields }}
+                    <div class="reference-summary-item">
+                        <a href="{{ .RelPermalink }}{{ .name }}/" class="reference-summary-item-code">{{ template "field" (dict "field" .) }}</a>
+                        {{ if .summary }}
+                            <p class="reference-summary-item-summary">{{ .summary }}</p>
+                        {{ end }}
+                    </div>
+                {{ end }}
+            {{ end }}
+
+            {{ if .Params.methods }}
+                <h1 class="reference-section">Methods</h1>
+                {{ $methods := sort .Params.methods "name" }}
+
+                {{ $publicMethods := where $methods "visibility" "ne" "protected" }}
+                {{ $protectedMethods := where $methods "visibility" "protected" }}
+
+                {{ range $publicMethods }}
+                    <div class="reference-summary-item">
+                        <a href="{{ $.RelPermalink }}{{ .name }}/" class="reference-summary-item-code">{{ template "function" (dict "function" . "method" true) }}</a>
+                        {{ if .summary }}
+                            <p class="reference-summary-item-summary">{{ .summary }}</p>
+                        {{ end }}
+                    </div>
+                {{ end }}
+
+                {{ range $protectedMethods }}
+                    <div class="reference-summary-item">
+                        <a href="{{ .RelPermalink }}{{ .name }}/" class="reference-summary-item-code">{{ template "function" (dict "function" . "method" true) }}</a>
+                        {{ if .summary }}
+                            <p class="reference-summary-item-summary">{{ .summary }}</p>
+                        {{ end }}
+                    </div>
+                {{ end }}
+            {{ end }}
+            
+            <!--<h1 class="reference-section">Operators</h1>-->
 
         </div></div>
 

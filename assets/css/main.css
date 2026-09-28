@@ -8,6 +8,10 @@
     src: url("/fonts/FiraCode-VariableFont_wght.ttf") format(truetype);
 }
 
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     background: #101010;
@@ -74,7 +78,6 @@ body {
 
 .reference-path {
     margin: 0;
-    margin-bottom: 1rem;
     font-family: regular, sans-serif;
     font-weight: 300;
     font-size: 16px;
@@ -83,11 +86,19 @@ body {
 
 .reference-path a {
     margin: 0;
-    margin-bottom: 1rem;
     font-family: regular, sans-serif;
     font-weight: 300;
     font-size: 16px;
     color: white;
+}
+
+.reference-type {
+    margin: 0;
+    margin-top: 1rem;
+    font-family: regular, sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: #c3c3c3;
 }
 
 .reference-title {
@@ -119,16 +130,33 @@ body {
 .reference-section {
     margin: 1rem 0;
     font-family: regular, sans-serif;
-    font-weight: 700;
-    font-size: 32px;
+    font-weight: 600;
+    font-size: 22px;
     color: white;
 }
 
-.reference-subsection {
-    margin: 1rem 0;
-    font-family: regular, sans-serif;
-    font-weight: 600;
-    font-size: 22px;
+.reference-summary-item {
+    
+}
+
+.reference-summary-item-code {
+    font-family: code, monospace;
+    color: #7a7e86;
+    text-decoration: none;
+}
+
+.reference-summary-item-code:hover {
+    text-decoration: underline;
+}
+
+.reference-summary-item-code span.token-identifier, .reference-summary-item-code span.token-self {
+    color: #539bff;
+}
+
+.reference-summary-item-summary {
+    margin-left: 32px;
+    margin-top: 0.5rem;
+    font-family: regular;
     color: white;
 }
 
@@ -145,19 +173,61 @@ body {
     background: #161616;
     border: 1px solid #676767;
     font-family: code, monospace;
+    overflow-x: auto;
 }
 
-.code-block span.token-identifier {
+.token-identifier {
     font-weight: 400;
+}
+
+.token-keyword {
+    font-weight: 700;
+}
+
+.token-self {
+    font-weight: 700;
+}
+
+.token-type {
+    font-weight: 400;
+}
+
+.token-punctuation {
+    font-weight: 400;
+}
+
+.token-type-punctuation {
+    font-weight: 400;
+}
+
+a[class^="token-"] {
+    text-decoration: none;
+}
+
+a[class^="token-"]:hover {
+    text-decoration: underline;
+}
+
+.code-block .token-identifier {
     color: #e0e0e0;
 }
 
-.code-block span.token-keyword {
-    font-weight: 700;
+.code-block .token-keyword {
     color: #ef6366;
 }
 
-.code-block span.token-type {
-    font-weight: 400;
+.code-block .token-self {
+    color: #ef6366;
+}
+
+.code-block .token-type {
     color: #6ed0b4;
+}
+
+.code-block .token-punctuation {
+    color: #bcbcbc;
+}
+
+.code-block .token-type-punctuation {
+    color: #43a78b;
 }
