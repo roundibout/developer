@@ -19,6 +19,7 @@
             {{ $root.AddPage (dict
                 "kind" "page"
                 "path" $childPath
+                "url" (printf "/spur/reference/%s/" $childPath)
                 "title" $name
                 "params" (merge
                     (dict "apiAncestors" $ancestors)
@@ -45,6 +46,7 @@
             {{ $root.AddPage (dict
                 "kind" "page"
                 "path" $childPath
+                "url" (printf "/spur/reference/%s/" $childPath)
                 "title" $name
                 "params" (merge
                     (dict "apiAncestors" $ancestors)
