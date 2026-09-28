@@ -3,3 +3,4 @@ extensibility: abstract
 
 methods:
   - name: Destroy
+    extensibility: open
