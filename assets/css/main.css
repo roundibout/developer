@@ -1,38 +1,163 @@
 @font-face {
-    font-family: fac;
-    src: url("/fonts/Jost-VariableFont_wght.ttf") format(truetype);
+    font-family: regular;
+    src: url("/fonts/Inter-VariableFont_opsz,wght.ttf") format(truetype);
+}
+
+@font-face {
+    font-family: code;
+    src: url("/fonts/FiraCode-VariableFont_wght.ttf") format(truetype);
 }
 
 body {
     margin: 0;
+    background: #101010;
 }
 
 .site-header {
     width: 100%;
     padding: 1rem;
-    background: #053119;
-}
-
-.header-content {
+    background: linear-gradient(to bottom, #1a1a1a, #053119);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 2rem;
+    border-bottom: 1px solid #676767;
 }
 
-.logo img {
+.site-header-logo img {
     display: block;
     height: 30px;
 }
 
-.tabs {
+.site-header-tabs {
     display: flex;
     gap: 2rem;
-    font-family: "Jost", sans-serif;
+    font-family: regular, sans-serif;
     transform: translateY(4px);
 }
 
-.tabs a {
+.site-header-tabs a {
     text-decoration: none;
-    color: white
+    color: white;
+    font-weight: 600;
+}
+
+.reference-layout {
+    display: grid;
+    grid-template-columns: 480px minmax(0, 1fr);
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+    min-height: 100vh;
+    border-left: 1px solid #676767;
+    border-right: 1px solid #676767;
+}
+
+.reference-sidebar {
+    padding: 24px;
+    border-right: 1px solid #676767;
+}
+
+.reference-content {
+    min-width: 0;
+}
+
+.reference-header {
+    padding: 2rem;
+    background: #1b1b1b;
+}
+
+.reference-header-content {
+    max-width: 1024px;
+    margin: 0 auto;
+}
+
+.reference-path {
+    margin: 0;
+    margin-bottom: 1rem;
+    font-family: regular, sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    color: white;
+}
+
+.reference-path a {
+    margin: 0;
+    margin-bottom: 1rem;
+    font-family: regular, sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    color: white;
+}
+
+.reference-title {
+    margin: 0;
+    font-family: regular, sans-serif;
+    font-weight: 800;
+    font-size: 42px;
+    color: white;
+}
+
+.reference-summary {
+    margin: 0.4rem 0;
+    margin-bottom: 1rem;
+    font-family: regular, sans-serif;
+    font-weight: 600;
+    font-size: 24px;
+    color: white;
+}
+
+.reference-body {
+    padding: 2rem;
+}
+
+.reference-body-content {
+    max-width: 1024px;
+    margin: 0 auto;
+}
+
+.reference-section {
+    margin: 1rem 0;
+    font-family: regular, sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    color: white;
+}
+
+.reference-subsection {
+    margin: 1rem 0;
+    font-family: regular, sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: white;
+}
+
+.reference-description {
+    margin: 0.2rem 0;
+    font-family: regular, sans-serif;
+    font-weight: 300;
+    color: white;
+}
+
+.code-block {
+    padding: 1rem;
+    border-radius: 1rem;
+    background: #161616;
+    border: 1px solid #676767;
+    font-family: code, monospace;
+}
+
+.code-block span.token-identifier {
+    font-weight: 400;
+    color: #e0e0e0;
+}
+
+.code-block span.token-keyword {
+    font-weight: 700;
+    color: #ef6366;
+}
+
+.code-block span.token-type {
+    font-weight: 400;
+    color: #6ed0b4;
 }

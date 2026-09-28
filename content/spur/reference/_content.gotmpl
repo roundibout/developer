@@ -1,11 +1,63 @@
-{{ $section := . }}
+{{ $root := . }}
 
-{{ range $name, $api := site.Data.spur.reference }}
-    {{ $section.AddPage (dict
-        "kind" "page"
-        "path" $name
-        "url" (printf "/spur/reference/%s/" $name)
-        "title" $name
-        "params" $api
-    ) }}
+{{ define "walk" }}
+    {{ $data := .data }}
+    {{ $path := .path }}
+    {{ $root := .root }}
+    {{ $ancestors := .ancestors }}
+
+    {{ range $name, $api := $data }}
+        {{ if eq $name "_api" }}
+            {{ continue }}
+        {{ end }}
+
+        {{ $childPath := path.Join $path $name }}
+
+        {{ if isset $api "_api" }}
+            {{ $childApi := $api._api }}
+
+            {{ $root.AddPage (dict
+                "kind" "page"
+                "path" $childPath
+                "title" $name
+                "params" (merge
+                    (dict "apiAncestors" $ancestors)
+                    $childApi
+                )
+            ) }}
+
+            {{ $childAncestors := collections.Append
+                (dict
+                    "name" $name
+                    "url" (printf "/spur/reference/%s/" $childPath)
+                )
+                $ancestors
+            }}
+
+            {{ template "walk" (dict
+                "data" $api
+                "root" $root
+                "path" $childPath
+                "ancestors" $childAncestors
+            ) }}
+
+        {{ else }}
+            {{ $root.AddPage (dict
+                "kind" "page"
+                "path" $childPath
+                "title" $name
+                "params" (merge
+                    (dict "apiAncestors" $ancestors)
+                    $api
+                )
+            ) }}
+        {{ end }}
+    {{ end }}
 {{ end }}
+
+{{ template "walk" (dict
+    "data" hugo.Data.spur.reference
+    "root" $root
+    "path" ""
+    "ancestors" (slice)
+) }}

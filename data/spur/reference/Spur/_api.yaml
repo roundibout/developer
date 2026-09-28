@@ -1,0 +1,14 @@
+kind: namespace
+summary: |
+  The Spur framework.
+members:
+  - name: SetCursor
+    kind: function
+  - name: Tags
+    kind: value
+    type: Tags
+    const: true
+  - name: "Null"
+    kind: value
+    type: "Null"
+    const: true

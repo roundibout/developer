@@ -1,6 +1,8 @@
 kind: class
 summary: |
   The base class for all widgets.
+description: |
+  Lorem ipsum
 extends: Object
 extensibility: abstract
 
@@ -23,7 +25,7 @@ methods:
       Removes the widget from its parent if the widget has a parent.
 
   - name: IsDescendantOf
-  - summary: |
+    summary: |
       Returns whether the widget is a descendant of the given widget or not.
     arguments:
       - name: ancestor

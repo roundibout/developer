@@ -1,7 +1,57 @@
 {{ define "main" }}
 
-<h1>{{ .Title }}</h1>
+<div class="reference-layout">
 
-<p>{{ .Params.summary }}</p>
+    <aside class="reference-sidebar">
+        
+    </aside>
+
+    <main class="reference-content">
+
+        <header class="reference-header"><div class="reference-header-content">
+            
+            <p class="reference-path">
+                {{ range $ancestor := .Params.apiAncestors }}<a href="{{ $ancestor.url }}">{{ $ancestor.name }}</a>.{{ end }}{{ .Title }}
+            </p>
+            <h1 class="reference-title">{{ if .Params.name }}{{.Params.name}}{{ else }}{{.Title}}{{ end }}</h1>
+            <p class="reference-summary">{{ .Params.summary }}</p>
+            {{ if eq .Params.kind "class" }}
+                <div class="code-block">
+                    {{ if .Params.extensibility }}
+                        {{ if eq .Params.extensibility "open" }}
+                            <span class="token-keyword">open</span> {{ end }}
+                        {{ if eq .Params.extensibility "abstract" }}
+                            <span class="token-keyword">abstract</span> {{ end }}
+                    {{ end }}
+                    <span class="token-keyword">class</span> <span class="token-identifier">{{ if .Params.name }}{{.Params.name}}{{ else }}{{.Title}}{{ end }}</span>
+                    {{ if .Params.extends }} <span class="token-keyword">extends</span> <span class="token-identifier">{{ .Params.extends }}</span>{{ end }}
+                </div>
+            {{ end }}
+            
+        </div></header>
+
+        <div class="reference-body"><div class="reference-body-content">
+            
+            <h1 class="reference-section">Summary</h1>
+            <!--<h2 class="reference-subsection">Constructors</h2>-->
+            <!--<h2 class="reference-subsection">Fields</h2>-->
+
+            {{ if .Params.methods }}
+                <h2 class="reference-subsection">Methods</h2>
+            {{ end }}
+            
+            <!--<h2 class="reference-subsection">Operators</h2>-->
+            {{ if .Params.description }}
+                <h2 class="reference-subsection">Description</h2>
+                <p class="reference-description">{{ .Params.description }}</p>
+            {{ end }}
+            
+            <h1 class="reference-section">API Reference</h1>
+
+        </div></div>
+
+    </main>
+
+</div>
 
 {{ end }}
