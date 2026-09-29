@@ -16,6 +16,35 @@
         {{ if isset $api "_api" }}
 
             {{ $childApi := $api._api }}
+            {{ $members := default (slice) $childApi.members }}
+
+            {{ range $memberName, $memberApi := $api }}
+                {{ if eq $memberName "_api" }}
+                    {{ continue }}
+                {{ end }}
+
+                {{ if isset $memberApi "_api" }}
+
+                    {{/* Nested directory: use its _api.yaml as the member */}}
+                    {{ $member := merge
+                        $memberApi._api
+                        (dict "name" $memberName)
+                    }}
+
+                    {{ $members = collections.Append $member $members }}
+
+                {{ else }}
+
+                    {{/* File: use the file's API as the member */}}
+                    {{ $member := merge
+                        $memberApi
+                        (dict "name" $memberName)
+                    }}
+
+                    {{ $members = collections.Append $member $members }}
+
+                {{ end }}
+            {{ end }}
 
             {{ $root.AddPage (dict
                 "kind" "page"
@@ -23,8 +52,11 @@
                 "url" (printf "/spur/reference/%s/" $childPath)
                 "title" $name
                 "params" (merge
-                    (dict "apiAncestors" $ancestors)
                     $childApi
+                    (dict
+                        "apiAncestors" $ancestors
+                        "members" $members
+                    )
                 )
             ) }}
 
@@ -35,6 +67,42 @@
                 )
                 $ancestors
             }}
+
+            {{ range $member := $childApi.members }}
+                {{ $memberPath := path.Join $childPath $member.name }}
+
+                {{ $root.AddPage (dict
+                    "kind" "page"
+                    "path" $memberPath
+                    "url" (printf "/spur/reference/%s/" $memberPath)
+                    "title" $member.name
+                    "params" (merge
+                        (dict
+                            "apiAncestors" $childAncestors
+                        )
+                        $member
+                    )
+                ) }}
+            {{ end }}
+
+            {{ if and (eq $childApi.kind "class") (isset $childApi "initializer") }}
+                {{ $memberPath := path.Join $childPath "__init" }}
+
+                {{ $root.AddPage (dict
+                    "kind" "page"
+                    "path" $memberPath
+                    "url" (printf "/spur/reference/%s/" $memberPath)
+                    "title" "__init"
+                    "params" (merge
+                        (dict 
+                            "apiAncestors" $childAncestors
+                            "kind" "initializer"
+                            "name" "__init"
+                        )
+                        $childApi.initializer
+                    )
+                ) }}
+            {{ end }}
 
             {{ template "walk" (dict
                 "data" $api
@@ -80,7 +148,7 @@
                 ) }}
             {{ end }}
 
-            {{ if and (eq $api.kind "class") $api.initializer }}
+            {{ if and (eq $api.kind "class") (isset $api "initializer") }}
                 {{ $memberPath := path.Join $childPath "__init" }}
 
                 {{ $root.AddPage (dict
