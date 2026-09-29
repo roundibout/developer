@@ -1,0 +1,11 @@
+kind: class
+name: JsonError
+
+members:
+  - kind: field
+    name: Kind
+    type: Spur.Enum.JsonErrorKind
+
+  - kind: field
+    name: Message
+    type: string

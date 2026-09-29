@@ -1,2 +1,254 @@
 kind: class
 name: JsonObject
+
+initializer:
+  summary: |
+    Initializes an empty object or a object populated from a table.
+  arguments:
+    - name: table
+      summary: |
+        An optional table to populate the object.
+      type:
+        kind: union
+        members:
+          - Spur.Json.ObjectTable
+          - nil
+
+members:
+  - kind: method
+    name: Get
+    summary: |
+      Returns the value at the given key or `nil` if no value is found at the given key.
+    arguments:
+      - name: key
+        type: string
+    returns:
+      - type:
+          kind: union
+          members:
+            - Spur.Json.Value
+            - nil
+
+  - kind: method
+    name: GetOr
+    summary: |
+      Returns the value at the given key or the given default value if no value is found at the given key.
+    arguments:
+      - name: key
+        type: string
+      - name: default
+        type: Spur.Json.Value
+    returns:
+      - type: Spur.Json.Value
+
+  - kind: method
+    name: GetBoolean
+    summary: |
+      Returns the boolean value at the given key or `nil` if no boolean value is found at the given key.
+    arguments:
+      - name: key
+        type: string
+    returns:
+      - type:
+          kind: union
+          members:
+            - boolean
+            - nil
+
+  - kind: method
+    name: GetNumber
+    summary: |
+      Returns the number value at the given key or `nil` if no number value is found at the given key.
+    arguments:
+      - name: key
+        type: string
+    returns:
+      - type:
+          kind: union
+          members:
+            - number
+            - nil
+
+  - kind: method
+    name: GetString
+    summary: |
+      Returns the string value at the given key or `nil` if no string value is found at the given key.
+    arguments:
+      - name: key
+        type: string
+    returns:
+      - type:
+          kind: union
+          members:
+            - string
+            - nil
+
+  - kind: method
+    name: GetObject
+    summary: |
+      Returns the object value at the given key or `nil` if no object value is found at the given key.
+    arguments:
+      - name: key
+        type: string
+    returns:
+      - type:
+          kind: union
+          members:
+            - Spur.Json.Object
+            - nil
+
+  - kind: method
+    name: GetArray
+    summary: |
+      Returns the array value at the given key or `nil` if no array value is found at the given key.
+    arguments:
+      - name: key
+        type: string
+    returns:
+      - type:
+          kind: union
+          members:
+            - Spur.Json.Array
+            - nil
+
+  - kind: method
+    name: GetBooleanOr
+    summary: |
+      Returns the boolean value at the given key or the given default value if no boolean value is found at the given key.
+    arguments:
+      - name: key
+        type: string
+      - name: default
+        type: boolean
+    returns:
+      - type: boolean
+
+  - kind: method
+    name: GetNumberOr
+    summary: |
+      Returns the number value at the given key or the given default value if no number value is found at the given key.
+    arguments:
+      - name: key
+        type: string
+      - name: default
+        type: number
+    returns:
+      - type: number
+
+  - kind: method
+    name: GetStringOr
+    summary: |
+      Returns the string value at the given key or the given default value if no string value is found at the given key.
+    arguments:
+      - name: key
+        type: string
+      - name: default
+        type: string
+    returns:
+      - type: string
+
+  - kind: method
+    name: GetObjectOr
+    summary: |
+      Returns the object value at the given key or the given default value if no object value is found at the given key.
+    arguments:
+      - name: key
+        type: string
+      - name: default
+        type: Spur.Json.Object
+    returns:
+      - type: Spur.Json.Object
+
+  - kind: method
+    name: GetArrayOr
+    summary: |
+      Returns the array value at the given key or the given default value if no array value is found at the given key.
+    arguments:
+      - name: key
+        type: string
+      - name: default
+        type: Spur.Json.Array
+    returns:
+      - type: Spur.Json.Array
+
+  - kind: method
+    name: Contains
+    summary: |
+      Returns whether there is a value at the given key.
+    arguments:
+      - name: key
+        type: string
+    returns:
+      - type: boolean
+
+  - kind: method
+    name: Set
+    summary: |
+      Sets the given key to the given value.
+    arguments:
+      - name: key
+        type: string
+      - name: value
+        type: Spur.Json.Value
+
+  - kind: method
+    name: Remove
+    summary: |
+      Removes any value from the given key.
+    arguments:
+      - name: key
+        type: string
+
+  - kind: method
+    name: Clear
+    summary: |
+      Clears all keys from the object.
+
+  - kind: method
+    name: Clone
+    summary: |
+      Returns a clone of the object.
+    returns:
+      - type: Spur.Json.Object
+
+  - kind: method
+    name: Format
+    summary: |
+      Formats the object into a string.
+    arguments:
+      - name: indent
+        type:
+          kind: union
+          members:
+            - number
+            - nil
+    returns:
+      - type: string
+
+  - kind: operator
+    name: __len
+    summary: |
+      Returns the number of keys the object contains.
+    returns:
+      - type: number
+
+  - kind: operator
+    name: __iter
+    summary: |
+      Returns an iterator for the object.
+    returns:
+      - type:
+          kind: function
+          returns:
+            - kind: union
+              members:
+                - string
+                - nil
+            - Spur.Json.Value
+
+  - kind: operator
+    name: __tostring
+    summary: |
+      Returns the object as a string.
+    returns:
+      - type: string

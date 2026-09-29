@@ -1,9 +1,10 @@
 {{ define "type" }}
+    {{ $links := .links }}
     {{- if reflect.IsMap .type -}}
         {{- if .type.external -}}
             {{/* External type */}}
-            {{- if .links -}}
-                {{- $url := index (index hugo.Data.spur.reference._external .type.source) (lower .type.external) -}}
+            {{- if $links -}}
+                {{- $url := index (index hugo.Data.spur.reference._external .type.source) .type.external -}}
                 {{- if $url -}}
                     <a href="{{ $url }}" class="token-type">{{ .type.external }}</a>
                 {{- else -}}
@@ -15,7 +16,7 @@
         {{- else if eq .type.kind "union" -}}
             {{- range $index, $member := .type.members -}}
                 {{- if gt $index 0 }} <span class="token-type-punctuation">|</span> {{ end -}}
-                {{- template "type" (dict "type" $member) -}}
+                {{- template "type" (dict "type" $member "links" $links) -}}
             {{- end -}}
         {{- end -}}
     {{- else -}}
@@ -41,7 +42,7 @@
                 {{- $name = $data.name -}}
             {{- end -}}
 
-            {{- if .links -}}
+            {{- if $links -}}
                 <a href="{{ printf "/spur/reference/%s/" (path.Join $parts) }}" class="token-type">{{ $name }}</a>
             {{- else -}}
                 <span class="token-type">{{ $name }}</span>
@@ -94,10 +95,10 @@
             {{ template "type" (dict "type" (index $function.returns 0).type "links" $links) }}
         {{- else if gt (len $function.returns) 1 -}}
             <span class="token-type-punctuation">:</span> <span class="token-type-punctuation">(</span>
-            {{ range $index, $member := $function.returns }}
-                {{ if gt $index 0 }}<span class="token-type-punctuation">,</span> {{ end }}
+            {{- range $index, $member := $function.returns -}}
+                {{- if gt $index 0 -}}<span class="token-type-punctuation">,</span> {{- end -}}
                 {{ template "type" (dict "type" $member.type "links" $links) }}
-            {{ end }}
+            {{- end -}}
             <span class="token-type-punctuation">)</span>
         {{ end }}
     {{ end }}
@@ -131,12 +132,22 @@
             <p class="reference-path">
                 {{ range $ancestor := .Params.apiAncestors }}<a href="{{ $ancestor.url }}">{{ $ancestor.name }}</a>.{{ end }}{{ .Title }}
             </p>
-            {{ if eq .Params.kind "class" }}
-                <p class="reference-type">Class</p>
-            {{ else if eq .Params.kind "namespace" }}
+            {{ if eq .Params.kind "namespace" }}
                 <p class="reference-type">Namespace</p>
+            {{ else if eq .Params.kind "class" }}
+                <p class="reference-type">Class</p>
+            {{ else if eq .Params.kind "initializer" }}
+                <p class="reference-type">Initializer</p>
+            {{ else if eq .Params.kind "constructor" }}
+                <p class="reference-type">Constructor</p>
+            {{ else if eq .Params.kind "field" }}
+                <p class="reference-type">Field</p>
+            {{ else if eq .Params.kind "method" }}
+                <p class="reference-type">Method</p>
+            {{ else if eq .Params.kind "operator" }}
+                <p class="reference-type">Operator</p>
             {{ end }}
-            <h1 class="reference-title">{{ if .Params.name }}{{.Params.name}}{{ else }}{{.Title}}{{ end }}</h1>
+            <h1 class="reference-title">{{ if .Params.name }}{{ .Params.name }}{{ else }}{{ .Title }}{{ end }}</h1>
             <p class="reference-summary">{{ .Params.summary }}</p>
             {{ if eq .Params.kind "class" }}
                 <div class="code-block">
@@ -145,9 +156,19 @@
                     {{ else if eq .Params.extensibility "abstract" }}
                         <span class="token-keyword">abstract</span> 
                     {{ end }}
-                    <span class="token-keyword">class</span> <span class="token-type">{{ if .Params.name }}{{.Params.name}}{{ else }}{{.Title}}{{ end }}</span>
+                    <span class="token-keyword">class</span> <span class="token-type">{{ if .Params.name }}{{ .Params.name }}{{ else }}{{ .Title }}{{ end }}</span>
                     {{ if .Params.extends }} <span class="token-keyword">extends</span> {{ template "type" (dict "type" .Params.extends "links" true) }}{{ end }}
                 </div>
+            {{ else if eq .Params.kind "initializer" }}
+                <div class="code-block">{{ template "function" (dict "function" .Params "method" true "links" true) }}</div>
+            {{ else if eq .Params.kind "constructor" }}
+                <div class="code-block">{{ template "function" (dict "function" .Params "links" true) }}</div>
+            {{ else if eq .Params.kind "field" }}
+                <div class="code-block">{{ template "field" (dict "field" .Params "links" true) }}</div>
+            {{ else if eq .Params.kind "method" }}
+                <div class="code-block">{{ template "function" (dict "function" .Params "method" true "links" true) }}</div>
+            {{ else if eq .Params.kind "operator" }}
+                <div class="code-block">{{ template "function" (dict "function" .Params "method" true "links" true) }}</div>
             {{ end }}
             
         </div></header>
@@ -158,84 +179,126 @@
                 <h1 class="reference-section">Description</h1>
                 <p class="reference-description">{{ .Params.description }}</p>
             {{ end }}
+
+            {{ if eq .Params.kind "namespace" }}
             
-            {{ if or (isset .Params "initializer") .Params.constructors }}
-                <h1 class="reference-section">Constructors</h1>
-                {{ if isset .Params "initializer" }}
-                    {{ $initializer := merge (dict "name" "__init") .Params.initializer }}
-                    <div class="reference-summary-item">
-                        <a href="{{ .RelPermalink }}__init/" class="reference-summary-item-code">{{ template "function" (dict "function" $initializer "method" true) }}</a>
-                        {{ if $initializer.summary }}
-                            <p class="reference-summary-item-summary">{{ $initializer.summary }}</p>
-                        {{ end }}
-                    </div>
-                {{ end }}
-                {{ if .Params.constructors }}
-                    {{ $constructors := sort .Params.constructors "name" }}
-                    {{ range $constructors }}
-                        <div class="reference-summary-item">
-                            <a href="{{ $.RelPermalink }}{{ .name }}/" class="reference-summary-item-code">{{ template "function" (dict "function" .) }}</a>
-                            {{ if .summary }}
-                                <p class="reference-summary-item-summary">{{ .summary }}</p>
-                            {{ end }}
-                        </div>
+            {{ else if eq .Params.kind "class" }}
+
+            {{ if isset .Params "initializer" }}
+                <h1 class="reference-section">Initializer</h1>
+                {{ $initializer := merge (dict "name" "__init") .Params.initializer }}
+                <div class="reference-item">
+                    <a href="{{ .RelPermalink }}__init/" class="code-link">{{ template "function" (dict "function" $initializer "method" true) }}</a>
+                    {{ if $initializer.summary }}
+                        <p class="reference-item-summary">{{ $initializer.summary }}</p>
                     {{ end }}
+                </div>
+            {{ end }}
+
+            {{ if .Params.members }}
+
+            {{ $fields := where .Params.members "kind" "field" }}
+            {{ $constructors := where .Params.members "kind" "constructor" }}
+            {{ $methods := where .Params.members "kind" "method" }}
+            {{ $operators := where .Params.members "kind" "operator" }}
+
+            {{ $publicFields := where $fields "visibility" "ne" "protected" }}
+            {{ $protectedFields := where $fields "visibility" "protected" }}
+
+            {{ $publicConstructors := where $constructors "visibility" "ne" "protected" }}
+            {{ $protectedConstructors := where $constructors "visibility" "protected" }}
+
+            {{ $publicMethods := where $methods "visibility" "ne" "protected" }}
+            {{ $protectedMethods := where $methods "visibility" "protected" }}
+
+            {{ $publicOperators := where $operators "visibility" "ne" "protected" }}
+            {{ $protectedOperators := where $operators "visibility" "protected" }}
+
+            {{ if $constructors }}
+                <h1 class="reference-section">Constructors</h1>
+                {{ range sort $publicConstructors "name" }}
+                    <div class="reference-item">
+                        <a href="{{ $.RelPermalink }}{{ .name }}/" class="code-link">{{ template "function" (dict "function" .) }}</a>
+                        {{ if .summary }}
+                            <p class="reference-item-summary">{{ .summary }}</p>
+                        {{ end }}
+                    </div>
+                {{ end }}
+                {{ range sort $protectedConstructors "name" }}
+                    <div class="reference-item">
+                        <a href="{{ $.RelPermalink }}{{ .name }}/" class="code-link">{{ template "function" (dict "function" .) }}</a>
+                        {{ if .summary }}
+                            <p class="reference-item-summary">{{ .summary }}</p>
+                        {{ end }}
+                    </div>
                 {{ end }}
             {{ end }}
             
-            {{ if .Params.fields }}
+            {{ if $fields }}
                 <h1 class="reference-section">Fields</h1>
-                {{ $fields := sort .Params.fields "name" }}
-
-                {{ $publicFields := where $fields "visibility" "ne" "protected" }}
-                {{ $protectedFields := where $fields "visibility" "protected" }}
-
-                {{ range $publicFields }}
-                    <div class="reference-summary-item">
-                        <a href="{{ $.RelPermalink }}{{ .name }}/" class="reference-summary-item-code">{{ template "field" (dict "field" .) }}</a>
+                {{ range sort $publicFields "name" }}
+                    <div class="reference-item">
+                        <a href="{{ $.RelPermalink }}{{ .name }}/" class="code-link">{{ template "field" (dict "field" .) }}</a>
                         {{ if .summary }}
-                            <p class="reference-summary-item-summary">{{ .summary }}</p>
+                            <p class="reference-item-summary">{{ .summary }}</p>
                         {{ end }}
                     </div>
                 {{ end }}
-
-                {{ range $protectedFields }}
-                    <div class="reference-summary-item">
-                        <a href="{{ .RelPermalink }}{{ .name }}/" class="reference-summary-item-code">{{ template "field" (dict "field" .) }}</a>
+                {{ range sort $protectedFields "name" }}
+                    <div class="reference-item">
+                        <a href="{{ .RelPermalink }}{{ .name }}/" class="code-link">{{ template "field" (dict "field" .) }}</a>
                         {{ if .summary }}
-                            <p class="reference-summary-item-summary">{{ .summary }}</p>
+                            <p class="reference-item-summary">{{ .summary }}</p>
                         {{ end }}
                     </div>
                 {{ end }}
             {{ end }}
 
-            {{ if .Params.methods }}
+            {{ if $methods }}
                 <h1 class="reference-section">Methods</h1>
-                {{ $methods := sort .Params.methods "name" }}
-
-                {{ $publicMethods := where $methods "visibility" "ne" "protected" }}
-                {{ $protectedMethods := where $methods "visibility" "protected" }}
-
-                {{ range $publicMethods }}
-                    <div class="reference-summary-item">
-                        <a href="{{ $.RelPermalink }}{{ .name }}/" class="reference-summary-item-code">{{ template "function" (dict "function" . "method" true) }}</a>
+                {{ range sort $publicMethods "name" }}
+                    <div class="reference-item">
+                        <a href="{{ $.RelPermalink }}{{ .name }}/" class="code-link">{{ template "function" (dict "function" . "method" true) }}</a>
                         {{ if .summary }}
-                            <p class="reference-summary-item-summary">{{ .summary }}</p>
+                            <p class="reference-item-summary">{{ .summary }}</p>
                         {{ end }}
                     </div>
                 {{ end }}
-
-                {{ range $protectedMethods }}
-                    <div class="reference-summary-item">
-                        <a href="{{ .RelPermalink }}{{ .name }}/" class="reference-summary-item-code">{{ template "function" (dict "function" . "method" true) }}</a>
+                {{ range sort $protectedMethods "name" }}
+                    <div class="reference-item">
+                        <a href="{{ .RelPermalink }}{{ .name }}/" class="code-link">{{ template "function" (dict "function" . "method" true) }}</a>
                         {{ if .summary }}
-                            <p class="reference-summary-item-summary">{{ .summary }}</p>
+                            <p class="reference-item-summary">{{ .summary }}</p>
                         {{ end }}
                     </div>
                 {{ end }}
             {{ end }}
-            
-            <!--<h1 class="reference-section">Operators</h1>-->
+
+            {{ if $operators }}
+                <h1 class="reference-section">Operators</h1>
+                {{ range sort $publicOperators "name" }}
+                    <div class="reference-item">
+                        <a href="{{ $.RelPermalink }}{{ .name }}/" class="code-link">{{ template "function" (dict "function" . "method" true) }}</a>
+                        {{ if .summary }}
+                            <p class="reference-item-summary">{{ .summary }}</p>
+                        {{ end }}
+                    </div>
+                {{ end }}
+                {{ range sort $protectedOperators "name" }}
+                    <div class="reference-item">
+                        <a href="{{ .RelPermalink }}{{ .name }}/" class="code-link">{{ template "function" (dict "function" . "method" true) }}</a>
+                        {{ if .summary }}
+                            <p class="reference-item-summary">{{ .summary }}</p>
+                        {{ end }}
+                    </div>
+                {{ end }}
+            {{ end }}
+
+            {{ end }}
+
+            {{ else if eq .Params.kind "method" }}
+
+            {{ end }}
 
         </div></div>
 

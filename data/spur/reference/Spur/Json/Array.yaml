@@ -1,2 +1,300 @@
 kind: class
 name: JsonArray
+
+initializer:
+  summary: |
+    Initializes an empty array or a array populated from a table.
+  arguments:
+    - name: table
+      summary: |
+        An optional table to populate the array.
+      type:
+        kind: union
+        members:
+          - Spur.Json.ArrayTable
+          - nil
+
+members:
+  - kind: method
+    name: Get
+    summary: |
+      Returns the value at the given index or `nil` if no value is found at the given index.
+    arguments:
+      - name: index
+        type: number                                                       
+    returns:
+      - type:
+          kind: union
+          members:
+            - Spur.Json.Value
+            - nil
+
+  - kind: method
+    name: GetOr
+    summary: |
+      Returns the value at the given index or the given default value if no value is found at the given index.
+    arguments:
+      - name: index
+        type: number
+      - name: default
+        type: Spur.Json.Value
+    returns:
+      - type: Spur.Json.Value
+
+  - kind: method
+    name: GetBoolean
+    summary: |
+      Returns the boolean value at the given index or `nil` if no boolean value is found at the given index.
+    arguments:
+      - name: index
+        type: number
+    returns:
+      - type:
+          kind: union
+          members:
+            - boolean
+            - nil
+
+  - kind: method
+    name: GetNumber
+    summary: |
+      Returns the number value at the given index or `nil` if no number value is found at the given index.
+    arguments:
+      - name: index
+        type: number
+    returns:
+      - type:
+          kind: union
+          members:
+            - number
+            - nil
+
+  - kind: method
+    name: GetString
+    summary: |
+      Returns the string value at the given index or `nil` if no string value is found at the given index.
+    arguments:
+      - name: index
+        type: number
+    returns:
+      - type:
+          kind: union
+          members:
+            - string
+            - nil
+
+  - kind: method
+    name: GetObject
+    summary: |
+      Returns the object value at the given index or `nil` if no object value is found at the given index.
+    arguments:
+      - name: index
+        type: number
+    returns:
+      - type:
+          kind: union
+          members:
+            - Spur.Json.Object
+            - nil
+
+  - kind: method
+    name: GetArray
+    summary: |
+      Returns the array value at the given index or `nil` if no array value is found at the given index.
+    arguments:
+      - name: index
+        type: number
+    returns:
+      - type:
+          kind: union
+          members:
+            - Spur.Json.Array
+            - nil
+
+  - kind: method
+    name: GetBooleanOr
+    summary: |
+      Returns the boolean value at the given index or the given default value if no boolean value is found at the given index.
+    arguments:
+      - name: index
+        type: number
+      - name: default
+        type: boolean
+    returns:
+      - type: boolean
+
+  - kind: method
+    name: GetNumberOr
+    summary: |
+      Returns the number value at the given index or the given default value if no number value is found at the given index.
+    arguments:
+      - name: index
+        type: number
+      - name: default
+        type: number
+    returns:
+      - type: number
+
+  - kind: method
+    name: GetStringOr
+    summary: |
+      Returns the string value at the given index or the given default value if no string value is found at the given index.
+    arguments:
+      - name: index
+        type: number
+      - name: default
+        type: string
+    returns:
+      - type: string
+
+  - kind: method
+    name: GetObjectOr
+    summary: |
+      Returns the object value at the given index or the given default value if no object value is found at the given index.
+    arguments:
+      - name: index
+        type: number
+      - name: default
+        type: Spur.Json.Object
+    returns:
+      - type: Spur.Json.Object
+
+  - kind: method
+    name: GetArrayOr
+    summary: |
+      Returns the array value at the given index or the given default value if no array value is found at the given index.
+    arguments:
+      - name: index
+        type: number
+      - name: default
+        type: Spur.Json.Array
+    returns:
+      - type: Spur.Json.Array
+
+  - kind: method
+    name: Contains
+    summary: |
+      Returns whether there is a value at the given index.
+    arguments:
+      - name: index
+        type: number
+    returns:
+      - type: boolean
+
+  - kind: method
+    name: Replace
+    summary: |
+      Replaces the value at the given index with the given value.
+    description: |
+      Throws an error if there is no value at the given key.
+    arguments:
+      - name: index
+        type: number
+      - name: value
+        type: Spur.Json.Value
+
+  - kind: method
+    name: Set
+    summary: |
+      Sets the given index to the given value, filling uninhabited indices before the given index with null values.
+    arguments:
+      - name: index
+        type: number
+      - name: value
+        type: Spur.Json.Value
+
+  - kind: method
+    name: Append
+    summary: |
+      Inserts the given value to the back of the array.
+    arguments:
+      - name: value
+        type: Spur.Json.Value
+
+  - kind: method
+    name: Insert
+    summary: |
+      Inserts the given value to the given index, shifting indices after the given index up by one.
+    arguments:
+      - name: index
+        type: number
+      - name: value
+        type: Spur.Json.Value
+
+  - kind: method
+    name: Remove
+    summary: |
+      Removes any value from the last index or the given index.
+    arguments:
+      - name: index
+        type:
+          kind: union
+          members:
+            - number
+            - nil
+
+  - kind: method
+    name: Clear
+    summary: |
+      Clears all indices from the array.
+
+  - kind: method
+    name: Clone
+    summary: |
+      Returns a clone of the array.
+    returns:
+      - type: Spur.Json.Array
+
+  - kind: method
+    name: Format
+    summary: |
+      Formats the array into a string.
+    arguments:
+      - name: indent
+        type:
+          kind: union
+          members:
+            - number
+            - nil
+    returns:
+      - type: string
+
+  - kind: operator
+    name: __len
+    summary: |
+      Returns the number of indices the array contains.
+    returns:
+      - type: number
+
+  - kind: operator
+    name: __iter
+    summary: |
+      Returns an iterator for the array.
+    returns:
+      - type:
+          kind: function
+          arguments:
+            - kind: table
+              indexer:
+                index: number
+                value: Spur.Json.Value
+            - number
+          returns:
+            - kind: union
+              members:
+                - number
+                - nil
+            - Spur.Json.Value
+      - type:
+          kind: table
+          indexer:
+            index: number
+            value: Spur.Json.Value
+      - type: number
+
+  - kind: operator
+    name: __tostring
+    summary: |
+      Returns the array as a string.
+    returns:
+      - type: string

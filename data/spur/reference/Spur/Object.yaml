@@ -1,6 +1,11 @@
 kind: class
 extensibility: abstract
 
-methods:
-  - name: Destroy
+initializer:
+  summary: |
+    Initializes the object.
+
+members:
+  - kind: method
+    name: Destroy
     extensibility: open

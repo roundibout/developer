@@ -135,25 +135,11 @@ body {
     color: white;
 }
 
-.reference-summary-item {
+.reference-item {
     
 }
 
-.reference-summary-item-code {
-    font-family: code, monospace;
-    color: #7a7e86;
-    text-decoration: none;
-}
-
-.reference-summary-item-code:hover {
-    text-decoration: underline;
-}
-
-.reference-summary-item-code span.token-identifier, .reference-summary-item-code span.token-self {
-    color: #539bff;
-}
-
-.reference-summary-item-summary {
+.reference-item-summary {
     margin-left: 32px;
     margin-top: 0.5rem;
     font-family: regular;
@@ -174,6 +160,20 @@ body {
     border: 1px solid #676767;
     font-family: code, monospace;
     overflow-x: auto;
+}
+
+.code-link {
+    font-family: code, monospace;
+    color: #7a7e86;
+    text-decoration: none;
+}
+
+.code-link:hover {
+    text-decoration: underline;
+}
+
+.code-link span.token-identifier, .code-link span.token-self {
+    color: #539bff;
 }
 
 .token-identifier {

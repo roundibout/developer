@@ -56,29 +56,47 @@
                 )
             ) }}
 
-            {{ if eq $api.kind "class" }}
-                {{ $classAncestors := collections.Append
-                    (dict
-                        "name" $name
-                        "url" (printf "/spur/reference/%s/" $childPath)
-                    )
-                    $ancestors
-                }}
-                {{ range $index, $method := $api.methods }}
+            {{ $memberAncestors := collections.Append
+                (dict
+                    "name" $name
+                    "url" (printf "/spur/reference/%s/" $childPath)
+                )
+                $ancestors
+            }}
+            {{ range $index, $member := $api.members }}
+                {{ $memberPath := path.Join $childPath $member.name }}
 
-                    {{ $methodPath := path.Join $childPath $method.name }}
-
-                    {{ $root.AddPage (dict
-                        "kind" "page"
-                        "path" $methodPath
-                        "url" (printf "/spur/reference/%s/" $methodPath)
-                        "title" $method.name
-                        "params" (merge
-                            (dict "apiAncestors" $classAncestors)
-                            $method
+                {{ $root.AddPage (dict
+                    "kind" "page"
+                    "path" $memberPath
+                    "url" (printf "/spur/reference/%s/" $memberPath)
+                    "title" $member.name
+                    "params" (merge
+                        (dict 
+                            "apiAncestors" $memberAncestors
                         )
-                    ) }}
-                {{ end }}
+                        $member
+                    )
+                ) }}
+            {{ end }}
+
+            {{ if and (eq $api.kind "class") $api.initializer }}
+                {{ $memberPath := path.Join $childPath "__init" }}
+
+                {{ $root.AddPage (dict
+                    "kind" "page"
+                    "path" $memberPath
+                    "url" (printf "/spur/reference/%s/" $memberPath)
+                    "title" "__init"
+                    "params" (merge
+                        (dict 
+                            "apiAncestors" $memberAncestors
+                            "kind" "initializer"
+                            "name" "__init"
+                        )
+                        $api.initializer
+                    )
+                ) }}
             {{ end }}
 
         {{ end }}
