@@ -55,6 +55,7 @@
                     $childApi
                     (dict
                         "apiAncestors" $ancestors
+                        "name" $name
                         "members" $members
                     )
                 )
@@ -119,7 +120,10 @@
                 "url" (printf "/spur/reference/%s/" $childPath)
                 "title" $name
                 "params" (merge
-                    (dict "apiAncestors" $ancestors)
+                    (dict 
+                        "apiAncestors" $ancestors
+                        "name" $name
+                    )
                     $api
                 )
             ) }}

@@ -155,7 +155,7 @@
         <header class="reference-header"><div class="reference-header-content">
             
             <p class="reference-path">
-                {{ range $ancestor := .Params.apiAncestors }}<a href="{{ $ancestor.url }}">{{ $ancestor.name }}</a>.{{ end }}{{ .Title }}
+                {{ range $ancestor := .Params.apiAncestors }}<a href="{{ $ancestor.url }}">{{ $ancestor.name }}</a>.{{ end }}{{ .Params.name }}
             </p>
             {{ if eq .Params.kind "namespace" }}
                 <p class="reference-type">Namespace</p>
@@ -176,16 +176,16 @@
             {{ else if eq .Params.kind "operator" }}
                 <p class="reference-type">Operator</p>
             {{ end }}
-            <h1 class="reference-title">{{ if .Params.alias }}{{ .Params.alias }}{{ else }}{{ .Title }}{{ end }}</h1>
+            <h1 class="reference-title">{{ if .Params.alias }}{{ .Params.alias }}{{ else }}{{ .Params.name }}{{ end }}</h1>
             <p class="reference-summary">{{ .Params.summary }}</p>
             {{ if eq .Params.kind "namespace" }}
-                <div class="code-block">{{ template "namespace" (merge (dict "name" .Title) .Params) }}</div>
+                <div class="code-block">{{ template "namespace" .Params }}</div>
             {{ else if eq .Params.kind "value" }}
-                <div class="code-block">{{ template "value" (dict "value" (merge (dict "name" .Title) .Params) "links" true) }}</div>
+                <div class="code-block">{{ template "value" (dict "value" .Params "links" true) }}</div>
             {{ else if eq .Params.kind "function" }}
-                <div class="code-block">{{ template "function" (dict "function" (merge (dict "name" .Title) .Params) "links" true) }}</div>
+                <div class="code-block">{{ template "function" (dict "function" .Params "links" true) }}</div>
             {{ else if eq .Params.kind "class" }}
-                <div class="code-block">{{ template "class" (dict "class" (merge (dict "name" .Title) .Params) "links" true) }}</div>
+                <div class="code-block">{{ template "class" (dict "class" .Params "links" true) }}</div>
             {{ else if eq .Params.kind "initializer" }}
                 <div class="code-block">{{ template "function" (dict "function" .Params "method" true "links" true) }}</div>
             {{ else if eq .Params.kind "constructor" }}

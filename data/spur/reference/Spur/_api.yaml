@@ -4,6 +4,9 @@ summary: |
 members:
   - name: SetCursor
     kind: function
+    arguments:
+      - name: icon
+        type: Spur.Enum.CursorIcon
   - name: Tags
     kind: value
     type: Tags

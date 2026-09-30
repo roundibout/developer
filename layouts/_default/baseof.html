@@ -3,7 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ .Title }}</title>
+
+    <title>{{- if .Params.alias -}}{{ .Params.alias }}{{- else -}}{{ .Title }}{{- end }} | Roundibout Developer</title>
+    {{ if .Params.summary }}
+        <meta name="description" content="{{ .Params.summary }}">
+    {{ end }}
+
+    <meta property="og:site_name" content="Roundibout Developer">
+    <meta property="og:title" content="{{- if .Params.alias -}}{{ .Params.alias }}{{- else -}}{{ .Title }}{{- end -}}">
+    {{ if .Params.summary }}
+        <meta property="og:description" content="{{ .Params.summary }}">
+    {{ end }}
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ .Permalink }}">
 
     {{ $css := resources.Get "css/main.css" }}
     <link rel="stylesheet" href="{{ $css.RelPermalink }}">
